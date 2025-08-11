@@ -13,7 +13,7 @@ export const products: Product[] = [
     price: 300,
     category: 'Food',
     // Use transparent PNG for main and set preview to the NEXT product per carousel behavior
-    imageMain: 'https://sdmntprwestus3.oaiusercontent.com/files/00000000-63bc-61fd-85d6-ce61cf29230d/raw?se=2025-08-11T12%3A21%3A21Z&sp=r&sv=2024-08-04&sr=b&scid=7d241efa-5d75-562a-8ae8-7c53b167a8f1&skoid=0da8417a-a4c3-4a19-9b05-b82cee9d8868&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-08-10T14%3A46%3A41Z&ske=2025-08-11T14%3A46%3A41Z&sks=b&skv=2024-08-04&sig=mryfzXte4O9aW2ndojEykuq1JHTZ7XDoxLIL3BATEk8%3D',
+    imageMain: './images/biryani.png',
     imageAlt: 'Juicy double chicken burger with cheese',
     imagePreviewTopRight: 'https://www.pngmart.com/files/22/Tossed-salad-PNG-File.png',
     accent: '#f59e0b',
