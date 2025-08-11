@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ease-snap: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.anton-regular { font-family: "Anton", sans-serif; font-weight: 400; font-style: normal; }
+
+/* Helpful defaults */
+* { -webkit-tap-highlight-color: transparent; }
+img { user-select: none; }
+
+/* Single-page layout: occupy viewport and prevent scroll */
+html, body, #root { height: 100vh; overflow: hidden; }
+body { overscroll-behavior: none; }
+
+/* Accessibility */
+.focus-ring:focus-visible { @apply outline-none ring-2 ring-neutral-900/50 ring-offset-2 ring-offset-white; }
+
+/* Anim surfaces */
+.elevated { @apply relative z-10; }
+.bg-blur-layer { filter: blur(64px); transform: translateZ(0); will-change: filter; }
+
+
