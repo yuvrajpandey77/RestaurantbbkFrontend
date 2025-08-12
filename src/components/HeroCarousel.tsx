@@ -277,12 +277,12 @@ export const HeroCarousel = ({ products, initialIndex = 0 }: HeroCarouselProps) 
           {/* Invisible anchor used only for measuring the preview position relative to main */}
           <div
             ref={previewAnchorRef}
-            className="pointer-events-none absolute -right-20 -top-24 opacity-0"
+            className="pointer-events-none absolute -right-12 -top-6 opacity-0"
             style={{ width: previewSize, height: previewSize }}
             aria-hidden
           />
         </div>
-        <div ref={mainContainerRef} className="relative w-[min(80vw,500px)] h-[min(80vw,500px)] select-none p-4 sm:p-6" onWheel={onWheel}>
+        <div ref={mainContainerRef} className="relative w-[min(80vw,500px)] h-[min(80vw,535px)] select-none p-4 sm:p-6" onWheel={onWheel}>
           {/* Main image: exits down-left, enters from preview anchor along same line */}
           <AnimatePresence custom={previewVector as any} mode="sync">
             <motion.img
