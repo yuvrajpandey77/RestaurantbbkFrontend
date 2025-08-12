@@ -13,7 +13,7 @@
 img { user-select: none; }
 
 /* Single-page layout: occupy viewport and prevent scroll */
-html, body, #root { height: 100vh; overflow: hidden; }
+html, body, #root { min-height: 100vh; height: 100vh; overflow: hidden; }
 body { overscroll-behavior: none; }
 
 /* Accessibility */

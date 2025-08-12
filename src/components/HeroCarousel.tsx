@@ -5,6 +5,7 @@ import IconButton from './IconButton';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { preloadImage } from '@/lib/utils';
 import ThumbGrid from './ThumbGrid';
+import { Header } from './Header';
 
 export interface HeroCarouselProps {
   products: Product[];
@@ -177,6 +178,7 @@ export const HeroCarousel = ({ products, initialIndex = 0 }: HeroCarouselProps) 
 
     // Position the preview image via transform relative to the main image center
     return (
+      
       <AnimatePresence initial={false}>
         <motion.img
           key={previewProduct.id + '-preview-overlay'}
@@ -233,12 +235,12 @@ export const HeroCarousel = ({ products, initialIndex = 0 }: HeroCarouselProps) 
 
   return (
     <section
-      className="relative mx-auto mt-4 grid h-[calc(100vh-72px)] max-w-7xl grid-cols-1 items-center gap-6 px-4 md:mt-6 md:px-6"
+      className="relative mx-auto grid h-[calc(100vh-72px)] max-w-7xl grid-cols-1 items-center gap-6 px-4 md:px-6"
       onKeyDown={onKey}
       aria-labelledby={titleId}
     >
       {/* Single centered column */}
-
+     
       <div className="relative flex flex-col items-center text-center">
         {/* Title and price with preview aligned to right (same column as header icons) */}
         <div className="elevated relative w-full" aria-live="polite">
@@ -280,7 +282,7 @@ export const HeroCarousel = ({ products, initialIndex = 0 }: HeroCarouselProps) 
             aria-hidden
           />
         </div>
-        <div ref={mainContainerRef} className="relative mt-2  w-[min(80vw,500px)] h-[min(80vw,500px)] select-none p-4 sm:p-6 md:mt-4" onWheel={onWheel}>
+        <div ref={mainContainerRef} className="relative w-[min(80vw,500px)] h-[min(80vw,500px)] select-none p-4 sm:p-6" onWheel={onWheel}>
           {/* Main image: exits down-left, enters from preview anchor along same line */}
           <AnimatePresence custom={previewVector as any} mode="sync">
             <motion.img
@@ -312,10 +314,8 @@ export const HeroCarousel = ({ products, initialIndex = 0 }: HeroCarouselProps) 
             </IconButton>
           </div>
         </div>
-      </div>
-
-      {/* Bottom-right thumbs aligned to container right to match header right content */}
-      <div className="pointer-events-auto absolute bottom-10 right-0 hidden md:block">
+        {/* Bottom-right thumbs aligned to container right to match header right content */}
+      <div className="pointer-events-auto absolute bottom-0 -right-8 hidden md:block">
         <ThumbGrid
           items={products}
           activeId={product.id}
@@ -327,6 +327,9 @@ export const HeroCarousel = ({ products, initialIndex = 0 }: HeroCarouselProps) 
           }}
         />
       </div>
+      </div>
+
+      
     </section>
   );
 };

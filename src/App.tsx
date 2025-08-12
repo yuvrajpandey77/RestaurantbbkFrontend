@@ -19,7 +19,7 @@ function App() {
       <main className="mx-auto max-w-7xl px-4 md:px-6">
         <div className="relative">
           {/* Vertical category rail at middle-left, aligned under header/logo */}
-          <div className="pointer-events-auto fixed left-30 top-1/2 hidden -translate-y-1/2 md:block">
+          <div className="pointer-events-auto fixed left-30 top-1/2 z-[999]  hidden -translate-y-1/2 md:block">
             <CategoryRail
               categories={[...categories]}
               active={activeCategory}

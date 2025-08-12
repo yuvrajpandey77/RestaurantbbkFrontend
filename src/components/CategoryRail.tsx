@@ -14,7 +14,7 @@ export const CategoryRail = memo(function CategoryRail({
 }: CategoryRailProps) {
   return (
     <aside className="select-none">
-      <div aria-label="Menu" className="mb-4 text-left text-xl font-semibold">Menu</div>
+      <div aria-label="Menu" className="mb-4 text-left text-xl z-[999] font-semibold ">Menu</div>
       <ul className="flex flex-col items-start gap-3 text-sm" role="listbox" aria-activedescendant={active}>
         {categories.map((c) => {
           const isActive = c === active;
@@ -23,7 +23,7 @@ export const CategoryRail = memo(function CategoryRail({
               <button
                 onClick={() => onSelect(c)}
                 className={cn(
-                  'focus-ring group inline-flex w-full items-center justify-start gap-2 rounded px-1 py-1 text-left',
+                  'focus-ring group relative inline-flex w-full items-center justify-start gap-2 rounded px-1 py-1 text-left transition-colors',
                   isActive ? 'text-neutral-900' : 'text-neutral-700 hover:text-neutral-900'
                 )}
                 aria-selected={isActive}
@@ -33,7 +33,8 @@ export const CategoryRail = memo(function CategoryRail({
                   {c}
                   <span
                     className={cn(
-                      'absolute -bottom-1 left-0 h-[1px] w-0 bg-neutral-900 transition-all duration-300',
+                      'absolute -bottom-1 left-0 h-[2px] w-0 bg-neutral-900 transition-all duration-300',
+                      'group-hover:w-full',
                       isActive && 'w-full'
                     )}
                     aria-hidden
