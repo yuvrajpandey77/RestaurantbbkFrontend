@@ -12,28 +12,24 @@ export const ThumbGrid = memo(function ThumbGrid({ items, activeId, onSelect }: 
   // Local menu-style thumbs with titles and images
   const thumbs: Array<{ title: string; image: string; productId: string }> = [
     {
-      title: 'Salad Menu',
-      image:
-        'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&w=320&q=60',
-      productId: 'salad-vegetable',
+      title: 'Lucknawi Chicken',
+      image: '/images/biryaniimage.webp',
+      productId: 'lucknawi-chicken-biryani',
     },
     {
-      title: 'Burger Menu',
-      image:
-        'https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=320&q=60',
-      productId: 'burger-double-cheese',
+      title: 'Awadhi Mutton',
+      image: '/images/secongbiryani.webp',
+      productId: 'awadhi-mutton-biryani',
     },
     {
-      title: 'Coffee Menu',
-      image:
-        'https://www.pngmart.com/files/21/Coffee-Cup-PNG-Isolated-Image.png',
-      productId: 'pastry-choco',
+      title: 'Dum Ke Biryani',
+      image: '/images/thirdbiryani.webp',
+      productId: 'dum-ke-biryani',
     },
     {
-      title: 'Pizza Menu',
-      image:
-        'https://www.pngmart.com/files/1/Pepperoni-Pizza-PNG-Transparent-Image.png',
-      productId: 'pizza-marinara',
+      title: 'Kacche Gosht',
+      image: '/images/fourthbiryani.webp',
+      productId: 'kacche-gosht-ki-biryani',
     },
   ];
 

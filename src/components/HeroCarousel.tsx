@@ -12,6 +12,9 @@ export interface HeroCarouselProps {
 }
 
 const duration = 0.38;
+const SPRING_SOFT = { type: 'spring', stiffness: 260, damping: 26, mass: 0.6 } as const;
+const SPRING_TEXT = { type: 'spring', stiffness: 300, damping: 30, mass: 0.7 } as const;
+const SPRING_PREVIEW = { type: 'spring', stiffness: 280, damping: 28, mass: 0.65 } as const;
 
 export const HeroCarousel = ({ products, initialIndex = 0 }: HeroCarouselProps) => {
   const [index, setIndex] = useState(initialIndex);
@@ -20,7 +23,9 @@ export const HeroCarousel = ({ products, initialIndex = 0 }: HeroCarouselProps) 
   const prefersReducedMotion = useReducedMotion();
   const nextBtnRef = useRef<HTMLButtonElement>(null);
   const mainContainerRef = useRef<HTMLDivElement>(null);
+  const previewAnchorRef = useRef<HTMLDivElement>(null);
   const [previewSize, setPreviewSize] = useState<number>(160);
+  const [previewVector, setPreviewVector] = useState<{ dx: number; dy: number }>({ dx: 80, dy: -60 });
 
   const product = products[index];
   const nextIndex = (index + 1) % products.length;
@@ -44,18 +49,38 @@ export const HeroCarousel = ({ products, initialIndex = 0 }: HeroCarouselProps) 
     };
   }, [index, products, nextIndex, prevIndex]);
 
-  // Keep preview image at 50% of main image width
+  // Keep preview size at 50% of main image width and compute vector from preview anchor -> main center
   useEffect(() => {
-    const el = mainContainerRef.current;
-    if (!el) return;
-    const update = () => setPreviewSize(Math.round(el.clientWidth * 0.5));
-    update();
-    const ro = new ResizeObserver(update);
-    ro.observe(el);
-    window.addEventListener('resize', update);
+    const mainEl = mainContainerRef.current;
+    const anchorEl = previewAnchorRef.current;
+    if (!mainEl) return;
+
+    const compute = () => {
+      setPreviewSize(Math.round(mainEl.clientWidth * 0.5));
+
+      if (!anchorEl) return;
+      // Compute centers
+      const mainRect = mainEl.getBoundingClientRect();
+      const anchorRect = anchorEl.getBoundingClientRect();
+      const mainCenterX = mainRect.left + mainRect.width / 2;
+      const mainCenterY = mainRect.top + mainRect.height / 2;
+      const anchorCenterX = anchorRect.left + anchorRect.width / 2;
+      const anchorCenterY = anchorRect.top + anchorRect.height / 2;
+      const dx = Math.round(anchorCenterX - mainCenterX);
+      const dy = Math.round(anchorCenterY - mainCenterY);
+      setPreviewVector({ dx, dy });
+    };
+
+    compute();
+    const ro = new ResizeObserver(compute);
+    ro.observe(mainEl);
+    if (anchorEl) ro.observe(anchorEl);
+    window.addEventListener('resize', compute);
+    window.addEventListener('scroll', compute, { passive: true });
     return () => {
       ro.disconnect();
-      window.removeEventListener('resize', update);
+      window.removeEventListener('resize', compute);
+      window.removeEventListener('scroll', compute);
     };
   }, []);
 
@@ -100,31 +125,111 @@ export const HeroCarousel = ({ products, initialIndex = 0 }: HeroCarouselProps) 
 
   const titleId = 'product-title';
 
-  const mainVariants = {
-    enter: (dir: 1 | -1) => ({
-      y: prefersReducedMotion ? 0 : -12 * dir,
-      opacity: 0,
-      scale: prefersReducedMotion ? 1 : 0.95,
+  // Smooth spring animations
+  const mainImageVariants = {
+    enter: (v: { dx: number; dy: number }) => ({
+      x: prefersReducedMotion ? 0 : v.dx,
+      y: prefersReducedMotion ? 0 : v.dy,
+      opacity: prefersReducedMotion ? 1 : 0.9,
+      scale: prefersReducedMotion ? 1 : 0.98,
     }),
-    center: { y: 0, opacity: 1, scale: 1, transition: { duration } },
-    exit: (dir: 1 | -1) => ({
-      y: prefersReducedMotion ? 0 : 40 * dir,
+    center: {
+      x: 0,
+      y: 0,
+      opacity: 1,
+      scale: 1,
+      transition: prefersReducedMotion ? { duration: 0.2 } : SPRING_SOFT,
+    },
+    exit: (v: { dx: number; dy: number }) => ({
+      x: prefersReducedMotion ? 0 : -v.dx * 1.15,
+      y: prefersReducedMotion ? 0 : -v.dy * 1.15,
       opacity: prefersReducedMotion ? 0 : 0,
-      scale: prefersReducedMotion ? 1 : 0.9,
-      transition: { duration },
+      scale: prefersReducedMotion ? 1 : 0.95,
+      transition: prefersReducedMotion ? { duration: 0.2 } : SPRING_SOFT,
     }),
   } as const;
 
-  const previewVariants = {
-    initial: (dir: 1 | -1) => ({
-      x: prefersReducedMotion ? 0 : 80 * dir,
-      y: prefersReducedMotion ? 0 : -60,
-      opacity: 0.7,
-      scale: prefersReducedMotion ? 1 : 0.95,
-      zIndex: 20,
+  const textVariants = {
+    enter: (dir: 1 | -1) => ({
+      y: prefersReducedMotion ? 0 : -8 * dir,
+      opacity: 0,
+      scale: prefersReducedMotion ? 1 : 0.98,
     }),
-    animate: { x: 0, y: 0, opacity: 1, scale: 1, zIndex: 20, transition: { duration } },
+    center: {
+      y: 0,
+      opacity: 1,
+      scale: 1,
+      transition: prefersReducedMotion ? { duration: 0.2 } : SPRING_TEXT,
+    },
+    exit: (dir: 1 | -1) => ({
+      y: prefersReducedMotion ? 0 : 22 * dir,
+      opacity: 0,
+      scale: prefersReducedMotion ? 1 : 0.98,
+      transition: prefersReducedMotion ? { duration: 0.2 } : SPRING_TEXT,
+    }),
   } as const;
+
+  // Preview overlay animation: next preview slides along same line from 2x offset to 1x offset
+  const renderPreviewOverlay = () => {
+    const n = products.length;
+    const previewIndex = (index + 1) % n;
+    const previewProduct = products[previewIndex];
+
+    // Position the preview image via transform relative to the main image center
+    return (
+      <AnimatePresence initial={false}>
+        <motion.img
+          key={previewProduct.id + '-preview-overlay'}
+          src={previewProduct.imageMain}
+          alt=""
+          aria-hidden
+          className="absolute inset-0 h-full w-full object-contain p-2"
+          style={{ filter: 'drop-shadow(0 10px 28px rgba(0,0,0,0.18))' }}
+          initial={{
+            x: prefersReducedMotion ? previewVector.dx : previewVector.dx * 2,
+            y: prefersReducedMotion ? previewVector.dy : previewVector.dy * 2,
+            opacity: prefersReducedMotion ? 1 : 0.9,
+            scale: prefersReducedMotion ? 0.5 : 0.5,
+            zIndex: 10,
+          }}
+          animate={{
+            x: previewVector.dx,
+            y: previewVector.dy,
+            opacity: 1,
+            scale: 0.5,
+            zIndex: 10,
+            transition: prefersReducedMotion ? { duration: 0.2 } : SPRING_PREVIEW,
+          }}
+          exit={{ opacity: 0, transition: { duration: duration * 0.25 } }}
+        />
+      </AnimatePresence>
+    );
+  };
+
+  // Wheel/trackpad navigation
+  const WHEEL_THRESHOLD = 60;
+  const WHEEL_COOLDOWN_MS = 420;
+  const wheelAccumRef = useRef(0);
+  const wheelLockRef = useRef(false);
+  const onWheel = useCallback(
+    (e: React.WheelEvent) => {
+      if (wheelLockRef.current || !ready) return;
+      const absY = Math.abs(e.deltaY);
+      const absX = Math.abs(e.deltaX);
+      const primary = absY >= absX ? e.deltaY : e.deltaX;
+      wheelAccumRef.current += primary;
+      if (Math.abs(wheelAccumRef.current) >= WHEEL_THRESHOLD) {
+        const dir: 1 | -1 = wheelAccumRef.current > 0 ? 1 : -1;
+        wheelAccumRef.current = 0;
+        wheelLockRef.current = true;
+        go(dir);
+        window.setTimeout(() => {
+          wheelLockRef.current = false;
+        }, WHEEL_COOLDOWN_MS);
+      }
+    },
+    [go, ready]
+  );
 
   return (
     <section
@@ -142,12 +247,12 @@ export const HeroCarousel = ({ products, initialIndex = 0 }: HeroCarouselProps) 
               key={product.id + '-title'}
               className="font-alata font-normal text-2xl tracking-wider sm:text-3xl md:text-5xl"
               id={titleId}
-              variants={mainVariants}
+              variants={textVariants}
               custom={direction}
               initial="enter"
               animate="center"
               exit="exit"
-              transition={{ ease: 'easeOut', duration }}
+              transition={undefined}
             >
               {product.title}
             </motion.h1>
@@ -156,57 +261,49 @@ export const HeroCarousel = ({ products, initialIndex = 0 }: HeroCarouselProps) 
             <motion.p
               key={product.id + '-price'}
               className="mt-1 font-unbounded font-normal text-base sm:text-lg text-neutral-800"
-              variants={mainVariants}
+              variants={textVariants}
               custom={direction}
               initial="enter"
               animate="center"
               exit="exit"
-              transition={{ ease: 'easeOut', duration: duration * 0.9 }}
+              transition={undefined}
             >
               ₹{product.price}
             </motion.p>
           </AnimatePresence>
 
-          {/* Preview image beside the title, aligned to the right edge */}
+          {/* Invisible anchor used only for measuring the preview position relative to main */}
           <div
-            className="pointer-events-none absolute -right-20 -top-24 hidden opacity-70 md:block"
+            ref={previewAnchorRef}
+            className="pointer-events-none absolute -right-20 -top-24 opacity-0"
             style={{ width: previewSize, height: previewSize }}
-          >
-            <motion.img
-              key={nextProduct.id + '-preview-title'}
-              src={nextProduct.imageMain}
-              alt=""
-              aria-hidden
-              className="h-full w-full object-contain p-2"
-              variants={previewVariants}
-              custom={direction}
-              initial="initial"
-              animate="animate"
-              transition={{ duration, ease: [0.22, 1, 0.36, 1] }}
-            />
-          </div>
+            aria-hidden
+          />
         </div>
-        <div ref={mainContainerRef} className="relative mt-2 aspect-[4/3] w-[min(86vw,740px)] max-h-[52vh] select-none p-4 sm:p-6 md:mt-4">
-          <AnimatePresence custom={direction} mode="wait">
+        <div ref={mainContainerRef} className="relative mt-2  w-[min(80vw,500px)] h-[min(80vw,500px)] select-none p-4 sm:p-6 md:mt-4" onWheel={onWheel}>
+          {/* Main image: exits down-left, enters from preview anchor along same line */}
+          <AnimatePresence custom={previewVector as any} mode="sync">
             <motion.img
               key={product.id}
               src={product.imageMain}
               alt={product.imageAlt}
               decoding="async"
               loading="eager"
-              className="absolute inset-0 h-full  w-full object-contain will-change-transform will-change-opacity"
+              className="absolute inset-0 h-full w-full object-cover will-change-transform will-change-opacity"
               style={{ filter: 'drop-shadow(0 14px 40px rgba(0,0,0,0.2))' }}
-              variants={mainVariants}
-              custom={direction}
+              variants={mainImageVariants}
+              custom={previewVector as any}
               initial="enter"
               animate="center"
               exit="exit"
-              transition={{ duration, ease: [0.22, 1, 0.36, 1] }}
+              transition={undefined}
             />
           </AnimatePresence>
+          {/* Preview overlay that lives in the same coordinate space and slides along the same line */}
+          {renderPreviewOverlay()}
           {/* Preview moved near the title */}
           {/* Chevron controls overlaid bottom-center for all breakpoints */}
-          <div className="pointer-events-auto absolute -bottom-10 left-1/2 z-30 -translate-x-1/2 flex items-center gap-4">
+          <div className="pointer-events-auto absolute -bottom-0 left-1/2 z-30 -translate-x-1/2 flex items-center gap-4">
             <IconButton aria-label="Previous" onClick={() => go(-1)}>
               <ChevronLeft className="h-5 w-5" />
             </IconButton>

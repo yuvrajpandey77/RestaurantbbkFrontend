@@ -21,6 +21,7 @@ body { overscroll-behavior: none; }
 
 /* Anim surfaces */
 .elevated { @apply relative z-10; }
-.bg-blur-layer { filter: blur(64px); transform: translateZ(0); will-change: filter; }
+.bg-blur-layer { filter: blur(120px); transform: translateZ(0); will-change: filter; }
+.bg-blur-layer-intense { filter: blur(200px); transform: translateZ(0); will-change: filter; }
 
 
