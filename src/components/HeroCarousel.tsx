@@ -243,7 +243,7 @@ export const HeroCarousel = ({ products, initialIndex = 0 }: HeroCarouselProps) 
      
       <div className="relative flex flex-col items-center text-center">
         {/* Title and price with preview aligned to right (same column as header icons) */}
-        <div className="elevated relative w-full" aria-live="polite">
+        <div className="elevated relative w-full pr-16 md:pr-0" aria-live="polite">
           <AnimatePresence custom={direction} mode="wait">
             <motion.h1
               key={product.id + '-title'}
@@ -282,7 +282,7 @@ export const HeroCarousel = ({ products, initialIndex = 0 }: HeroCarouselProps) 
             aria-hidden
           />
         </div>
-        <div ref={mainContainerRef} className="relative w-[min(80vw,500px)] h-[min(80vw,535px)] select-none p-4 sm:p-6" onWheel={onWheel}>
+        <div ref={mainContainerRef} className="relative  h-[min(90vw,530px)] w-[min(80vw,530px)]  sm:w-[min(80vw,500px)] sm:h-[min(80vw,535px)] select-none p-0 sm:p-6" onWheel={onWheel}>
           {/* Main image: exits down-left, enters from preview anchor along same line */}
           <AnimatePresence custom={previewVector as any} mode="sync">
             <motion.img
