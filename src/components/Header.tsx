@@ -37,7 +37,7 @@ export const Header = () => {
           <button aria-label="Cart" className="focus-ring rounded-full p-2 hover:bg-black/5 transition-colors" onClick={onClick('cart')}>
             <ShoppingCart className="h-5 w-5" />
           </button>
-          <button aria-label="User profile" className="focus-ring rounded-full p-2 hover:bg-black/5 transition-colors" onClick={onClick('user')}>
+          <button aria-label="User profile" className="focus-ring rounded-full p-2 bg-black/5 transition-colors" onClick={onClick('user')}>
             <User className="h-5 w-5" />
           </button>
           
