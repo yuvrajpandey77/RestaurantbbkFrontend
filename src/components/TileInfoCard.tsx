@@ -37,6 +37,8 @@ export const TileInfoCard = memo(function TileInfoCard({ product }: TileInfoCard
         <span className="inline-flex items-center gap-1 rounded-full border border-neutral-200 bg-white/70 px-2 py-1 text-[11px] text-neutral-700">
           <BadgeCheck className="h-3.5 w-3.5 text-emerald-500" /> In stock
         </span>
+
+        
       </div>
       <div className="mb-4 flex flex-wrap gap-2">
         <span className="inline-flex items-center gap-1 rounded-full bg-neutral-900 text-white px-2.5 py-1 text-[11px]">{product.category}</span>
