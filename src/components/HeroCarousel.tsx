@@ -4,8 +4,10 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import IconButton from './IconButton';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { preloadImage } from '@/lib/utils';
-import ThumbGrid from './ThumbGrid';
+// Thumbnails removed per updated layout
 import { Header } from './Header';
+import TileInfoCard from '@/components/TileInfoCard';
+import ProductDetailsOverlay from '@/components/ProductDetailsOverlay';
 
 export interface HeroCarouselProps {
   products: Product[];
@@ -16,10 +18,12 @@ const duration = 0.38;
 const SPRING_SOFT = { type: 'spring', stiffness: 260, damping: 26, mass: 0.6 } as const;
 const SPRING_TEXT = { type: 'spring', stiffness: 300, damping: 30, mass: 0.7 } as const;
 const SPRING_PREVIEW = { type: 'spring', stiffness: 280, damping: 28, mass: 0.65 } as const;
+const PREVIEW_OFFSET_X = 120; // shift preview slightly right to avoid overlapping text
 
 export const HeroCarousel = ({ products, initialIndex = 0 }: HeroCarouselProps) => {
   const [index, setIndex] = useState(initialIndex);
   const [direction, setDirection] = useState<1 | -1>(1);
+  const [showDetails, setShowDetails] = useState(false);
   const [ready, setReady] = useState(true);
   const prefersReducedMotion = useReducedMotion();
   const nextBtnRef = useRef<HTMLButtonElement>(null);
@@ -188,14 +192,14 @@ export const HeroCarousel = ({ products, initialIndex = 0 }: HeroCarouselProps) 
           className="absolute inset-0 h-full w-full object-contain p-2"
           style={{ filter: 'drop-shadow(0 10px 28px rgba(0,0,0,0.18))' }}
           initial={{
-            x: prefersReducedMotion ? previewVector.dx : previewVector.dx * 2,
+            x: (prefersReducedMotion ? previewVector.dx : previewVector.dx * 2) + PREVIEW_OFFSET_X,
             y: prefersReducedMotion ? previewVector.dy : previewVector.dy * 2,
             opacity: prefersReducedMotion ? 1 : 0.9,
             scale: prefersReducedMotion ? 0.5 : 0.5,
             zIndex: 10,
           }}
           animate={{
-            x: previewVector.dx,
+            x: previewVector.dx + PREVIEW_OFFSET_X,
             y: previewVector.dy,
             opacity: 1,
             scale: 0.5,
@@ -235,19 +239,27 @@ export const HeroCarousel = ({ products, initialIndex = 0 }: HeroCarouselProps) 
 
   return (
     <section
-      className="relative mx-auto grid h-[calc(100vh-72px)] max-w-7xl grid-cols-1 items-center gap-6 px-4 md:px-6"
+      className="relative mx-auto grid h-[calc(100vh-72px)] max-w-7xl grid-cols-1 items-center gap-6 px-4 md:px-6 md:pr-80"
       onKeyDown={onKey}
       aria-labelledby={titleId}
     >
+      {/* Dynamic product background */}
+      {product.imageBg && (
+        <img src={product.imageBg} alt="" className="pointer-events-none fixed inset-0 -z-10 h-full w-full object-cover opacity-80" />
+      )}
       {/* Single centered column */}
      
-      <div className="relative flex flex-col items-center text-center">
+      <div className="relative flex flex-col items-start text-left">
         {/* Title and price with preview aligned to right (same column as header icons) */}
-        <div className="elevated relative w-full pr-16 md:pr-0" aria-live="polite">
+        <div className="elevated relative w-full" aria-live="polite">
           <AnimatePresence custom={direction} mode="wait">
             <motion.h1
               key={product.id + '-title'}
-              className="font-alata font-normal text-2xl tracking-wider sm:text-3xl md:text-5xl"
+              className={`font-alata font-normal text-2xl tracking-wider sm:text-3xl md:text-5xl inline-block rounded-xl px-3 py-1 backdrop-blur-sm border ${
+                product.id === 'granalt-green-flakes-800x2400'
+                  ? 'bg-white/70 text-neutral-900 border-black/10 shadow-[0_2px_16px_rgba(0,0,0,0.12)]'
+                  : 'bg-black/40 text-white border-white/10 shadow-[0_2px_20px_rgba(0,0,0,0.25)]'
+              }`}
               id={titleId}
               variants={textVariants}
               custom={direction}
@@ -262,7 +274,11 @@ export const HeroCarousel = ({ products, initialIndex = 0 }: HeroCarouselProps) 
           <AnimatePresence custom={direction} mode="wait">
             <motion.p
               key={product.id + '-price'}
-              className="mt-1 font-unbounded font-normal text-base sm:text-lg text-neutral-800"
+              className={`mt-2 inline-block font-unbounded font-normal text-base sm:text-lg rounded-lg px-2.5 py-1 backdrop-blur-sm border ${
+                product.id === 'granalt-green-flakes-800x2400'
+                  ? 'bg-white/70 text-neutral-900 border-black/10'
+                  : 'bg-black/40 text-white/90 border-white/10'
+              }`}
               variants={textVariants}
               custom={direction}
               initial="enter"
@@ -283,6 +299,18 @@ export const HeroCarousel = ({ products, initialIndex = 0 }: HeroCarouselProps) 
           />
         </div>
         <div ref={mainContainerRef} className="relative  h-[min(90vw,530px)] w-[min(80vw,530px)]  sm:w-[min(80vw,500px)] sm:h-[min(80vw,535px)] select-none p-0 sm:p-6" onWheel={onWheel}>
+          {/* Circular accent glow behind the main image (60% of container) */}
+          <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+            <div
+              className="rounded-full"
+              style={{
+                width: '60%',
+                height: '60%',
+                background: `radial-gradient(closest-side, ${product.accent}33, transparent 70%)`,
+                boxShadow: '0 30px 80px rgba(0,0,0,0.15)'
+              }}
+            />
+          </div>
           {/* Main image: exits down-left, enters from preview anchor along same line */}
           <AnimatePresence custom={previewVector as any} mode="sync">
             <motion.img
@@ -291,7 +319,7 @@ export const HeroCarousel = ({ products, initialIndex = 0 }: HeroCarouselProps) 
               alt={product.imageAlt}
               decoding="async"
               loading="eager"
-              className="absolute inset-0 h-full w-full object-cover will-change-transform will-change-opacity"
+              className="absolute inset-0 z-20 h-full w-full object-contain will-change-transform will-change-opacity"
               style={{ filter: 'drop-shadow(0 14px 40px rgba(0,0,0,0.2))' }}
               variants={mainImageVariants}
               custom={previewVector as any}
@@ -299,34 +327,28 @@ export const HeroCarousel = ({ products, initialIndex = 0 }: HeroCarouselProps) 
               animate="center"
               exit="exit"
               transition={undefined}
+              onClick={() => setShowDetails(true)}
             />
           </AnimatePresence>
           {/* Preview overlay that lives in the same coordinate space and slides along the same line */}
           {renderPreviewOverlay()}
           {/* Preview moved near the title */}
-          {/* Chevron controls overlaid bottom-center for all breakpoints */}
-          <div className="pointer-events-auto absolute -bottom-0 left-1/2 z-30 -translate-x-1/2 flex items-center gap-4">
-            <IconButton aria-label="Previous" onClick={() => go(-1)}>
-              <ChevronLeft className="h-5 w-5" />
-            </IconButton>
+          {/* Chevron controls moved to right side of the image */}
+          <div className="pointer-events-auto absolute top-1/2 -translate-y-1/2 right-[-10px] z-30 flex flex-col items-center gap-2">
             <IconButton aria-label="Next" onClick={() => go(1)} ref={nextBtnRef as any}>
               <ChevronRight className="h-5 w-5" />
             </IconButton>
+            <IconButton aria-label="Previous" onClick={() => go(-1)}>
+              <ChevronLeft className="h-5 w-5" />
+            </IconButton>
           </div>
         </div>
-        {/* Bottom-right thumbs aligned to container right to match header right content */}
-      <div className="pointer-events-auto absolute bottom-0 -right-8 hidden md:block">
-        <ThumbGrid
-          items={products}
-          activeId={product.id}
-          onSelect={(id: string) => {
-            const idx = products.findIndex((p) => p.id === id);
-            if (idx !== -1) {
-              goTo(idx);
-            }
-          }}
-        />
+      <div className="pointer-events-auto absolute -right-48 -bottom-40 -translate-y-1/2 hidden md:block z-40">
+        <TileInfoCard product={product} />
       </div>
+      {showDetails && (
+        <ProductDetailsOverlay product={product} onClose={() => setShowDetails(false)} />
+      )}
       </div>
 
       

@@ -6,26 +6,19 @@ import { categories, products } from '@/data/products';
 import { useMemo, useState } from 'react';
 
 function App() {
-  const [activeCategory, setActiveCategory] = useState<string>('Food');
+  const [activeCategory, setActiveCategory] = useState<string>('Tiles');
   const filtered = useMemo(
-    () => products.filter((p) => p.category === activeCategory || activeCategory === 'Food'),
+    () => products.filter((p) => p.category === activeCategory || activeCategory === 'Tiles'),
     [activeCategory]
   );
 
   return (
     <div className="relative h-screen overflow-hidden isolate">
-      <BackgroundGlow />
+      {/* BackgroundGlow kept as fallback if a product lacks imageBg */}
       <Header />
       <main className="relative z-0 mx-auto max-w-7xl px-4 md:px-6">
         <div className="relative z-0">
-          {/* Vertical category rail at middle-left, aligned under header/logo */}
-          <div className="pointer-events-auto fixed left-30 top-1/2 z-[999]  hidden -translate-y-1/2 md:block">
-            <CategoryRail
-              categories={[...categories]}
-              active={activeCategory}
-              onSelect={setActiveCategory}
-            />
-          </div>
+          {/* Left rail hidden; using TileInfoCard inside hero */}
           <HeroCarousel products={products} />
         </div>
       </main>

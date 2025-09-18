@@ -6,7 +6,7 @@ export const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const onClick = (name: string) => () => console.log(`${name} clicked`);
 
-  const nav = ['Menu', 'About', 'Home', 'Services', 'Contact'];
+  const nav = ['Products', 'Marble', 'Tiles', 'About', 'Contact'];
   
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
@@ -22,11 +22,11 @@ export const Header = () => {
             <a
               key={n}
               href="#"
-              className="focus-ring group relative text-neutral-900/80 transition-colors hover:text-neutral-900"
+              className="focus-ring group relative text-white/80 transition-colors hover:text-white"
             >
               <span className="relative">
                 {n}
-                <span className="absolute -bottom-1 left-0 h-[2px] w-0 bg-neutral-900 transition-all duration-300 group-hover:w-full" aria-hidden />
+                <span className="absolute -bottom-1 left-0 h-[2px] w-0 bg-white transition-all duration-300 group-hover:w-full" aria-hidden />
               </span>
             </a>
           ))}

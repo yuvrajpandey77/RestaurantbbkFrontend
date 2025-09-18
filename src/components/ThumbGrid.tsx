@@ -9,29 +9,7 @@ export interface ThumbGridProps {
 }
 
 export const ThumbGrid = memo(function ThumbGrid({ items, activeId, onSelect }: ThumbGridProps) {
-  // Local menu-style thumbs with titles and images
-  const thumbs: Array<{ title: string; image: string; productId: string }> = [
-    {
-      title: 'Lucknawi Chicken',
-      image: '/images/biryaniimage.webp',
-      productId: 'lucknawi-chicken-biryani',
-    },
-    {
-      title: 'Awadhi Mutton',
-      image: '/images/secongbiryani.webp',
-      productId: 'awadhi-mutton-biryani',
-    },
-    {
-      title: 'Dum Ke Biryani',
-      image: '/images/thirdbiryani.webp',
-      productId: 'dum-ke-biryani',
-    },
-    {
-      title: 'Kacche Gosht',
-      image: '/images/fourthbiryani.webp',
-      productId: 'kacche-gosht-ki-biryani',
-    },
-  ];
+  const thumbs = items.map((p) => ({ title: p.title, image: p.imageMain, productId: p.id }));
 
   return (
     <div className="grid grid-cols-2 gap-4 md:gap-6">

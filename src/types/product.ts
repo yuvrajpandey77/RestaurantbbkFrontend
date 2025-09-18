@@ -3,18 +3,16 @@ export interface Product {
   title: string;
   price: number;
   category:
-    | 'Food'
-    | 'Juice'
-    | 'Pastry'
-    | 'Snakes'
-    | 'Drinks'
-    | 'Coffee'
-    | 'Tea'
-    | 'Milkshake';
+    | 'Tiles'
+    | 'Marble'
+    | 'Wall Tiles'
+    | 'Floor Tiles'
+    | 'Outdoor';
   imageMain: string;
   imageAlt: string;
   imagePreviewTopRight: string;
   accent: string;
+  imageBg?: string;
 }
 
 

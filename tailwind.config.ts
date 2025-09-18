@@ -5,9 +5,12 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        alata: ['Alata', 'sans-serif'],
-        anton: ['Anton', 'sans-serif'],
-        unbounded: ['"Unbounded"', 'system-ui', 'sans-serif'],
+        // Remap existing keys to royal serif/display families for a richer look
+        alata: ['Cinzel', 'serif'],
+        anton: ['"Cormorant Garamond"', 'serif'],
+        unbounded: ['"Playfair Display"', 'serif'],
+        brandSerif: ['"Cormorant Garamond"', 'serif'],
+        brandDisplay: ['Cinzel', 'serif'],
       },
       colors: {
         brand: {
